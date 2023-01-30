@@ -18,3 +18,15 @@
 - (\*)all incoming HTTP requests are
   served in their own goroutine. For busy servers, this means it’s very likely that the code in or
   called by your handlers will be running concurrently.
+
+- for env variable we can use `os.Getenv()` but it has some drawbacks
+
+  - (the return value from os.Getenv() is the empty string if the environment
+    variable doesn’t exist)
+  - you don’t get the -help functionality that you do with command-line
+    flags, and the return value from os.Getenv() is always a string — you don’t get automatic
+    type conversions like you do with flag.Int() and the other command line flag functions
+
+- As a rule of thumb, you should avoid using the `Panic()` and `Fatal()` variations outside of
+  your `main()` function — it’s good practice to return errors instead, and only panic or exit
+  directly from `main()`.
