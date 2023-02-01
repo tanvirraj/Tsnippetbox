@@ -30,3 +30,41 @@
 - As a rule of thumb, you should avoid using the `Panic()` and `Fatal()` variations outside of
   your `main()` function — it’s good practice to return errors instead, and only panic or exit
   directly from `main()`.
+
+- **(\*)** The sql.Open() function returns a sql.DB object. This isn’t a database connection — it’s a
+  pool of many connections. This is an important difference to understand. Go manages the
+  connections in this pool as needed, automatically opening and closing connections to the
+  database via the driver.
+
+- The internal directory is being used to hold ancillary non-applicationspecific code, which could potentially be reused. A database model which could be used
+  by other applications in the future (like a command line interface application) fits the bill
+  here.
+
+- we’re returning the ErrNoRecord error from our SnippetModel.Get() method, instead of sql.ErrNoRows directly. The reason is to help encapsulate the model completely, so that our application isn’t concerned with the underlying datastore or reliant on datastore-specific errors for its behavior.
+
+```
+  if errors.Is(err, sql.ErrNoRows) {
+  return nil, ErrNoRecord
+  } else {
+  return nil, err
+  }
+```
+
+- As you’re probably starting to realize, the database/sql package essentially provides a
+  standard interface between your Go application and the world of SQL databases.
+  So long as you use the database/sql package, the Go code you write will generally be
+  portable and will work with any kind of SQL database — whether it’s MySQL, PostgreSQL,
+  SQLite or something else. This means that your application isn’t so tightly coupled to the
+  database that you’re currently using, and the theory is that you can swap databases in the
+  future without re-writing all of your code (driver-specific quirks and SQL implementations
+  aside).
+  It’s important to note that while database/sql generally does a good job of providing a
+  standard interface for working with SQL databases, there are some idiosyncrasies in the way
+  that different drivers and databases operate. It’s always a good idea to read over the
+  documentation for a new driver to understand any quirks and edge cases before you begin
+  using it.
+
+- the Exec(), Query() and QueryRow() methods all use prepared
+  statements behind the scenes to help prevent SQL injection attacks. They set up a prepared
+  statement on the database connection, run it with the parameters provided, and then close
+  the prepared statement.

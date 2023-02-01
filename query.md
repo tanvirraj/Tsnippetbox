@@ -1,2 +1,6 @@
-what is stack trace ?
-what is encapsulated?
+- stack trace ?
+- encapsulated?
+- checksums
+- database connection pool ?
+- dependancy injection in go
+- understanding about "errors" package, ex: errors.Is(err, models.ErrNoRecord)
