@@ -5,3 +5,4 @@
 - dependancy injection in go
 - understanding about "errors" package, ex: errors.Is(err, models.ErrNoRecord)
 - what is buffer in file system
+- adapter pattern

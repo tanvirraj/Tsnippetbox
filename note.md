@@ -44,10 +44,10 @@
 
 ```
   if errors.Is(err, sql.ErrNoRows) {
-  return nil, ErrNoRecord
-  } else {
-  return nil, err
-  }
+		return nil, ErrNoRecord
+	} else {
+		return nil, err
+	}
 ```
 
 - As you’re probably starting to realize, the database/sql package essentially provides a
@@ -68,3 +68,52 @@
   statements behind the scenes to help prevent SQL injection attacks. They set up a prepared
   statement on the database connection, run it with the parameters provided, and then close
   the prepared statement.
+
+- a simple middleware pattern code example
+
+```
+func myMiddleware(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Execute our middleware logic here...
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
+```
+
+in very simple terms `myMiddleware()` is a function that
+accepts the next handler in a chain as a parameter. It returns a handler which executes some
+logic and then calls the next handler.
+
+very common middleware pattern in most app
+
+```
+func myMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Execute our middleware logic here...
+		next.ServeHTTP(w, r)
+	})
+}
+
+```
+
+- In any middleware handler, code which comes before `next.ServeHTTP()` will be executed on
+  the way down the chain, and any code after `next.ServeHTTP()` — or in a deferred function —
+  will be executed on the way back up.
+
+```
+func myMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Any code here will execute on the way down the chain.
+		next.ServeHTTP(w, r)
+		// Any code here will execute on the way back up the chain.
+	})
+}
+
+```
+
+- It’s important to realise that our middleware will only recover panics that happen in the same
+  goroutine that executed the recoverPanic() middleware.
+  if you are spinning up additional goroutines from within your web application and there is
+  any chance of a panic, you must make sure that you recover any panics from within those too.
