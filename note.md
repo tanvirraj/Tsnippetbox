@@ -117,3 +117,12 @@ func myMiddleware(next http.Handler) http.Handler {
   goroutine that executed the recoverPanic() middleware.
   if you are spinning up additional goroutines from within your web application and there is
   any chance of a panic, you must make sure that you recover any panics from within those too.
+
+- what happens in our application is that the LoadAndSave() middleware checks each
+  incoming request for a session cookie. If a session cookie is present, it reads the session token
+  and retrieves the corresponding session data from the database (while also checking that the
+  session hasn’t expired). It then adds the session data to the request context so it can be used
+  in your handlers.
+  Any changes that you make to the session data in your handlers are updated in the request
+  context, and then the LoadAndSave() middleware updates the database with any changes to
+  the session data before it returns.
