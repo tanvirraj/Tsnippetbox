@@ -10,3 +10,4 @@
 - TLS handshake
 - what is Connection timeouts in server
 - HTTP persistent connection
+- HTTP lifetime of the request.
